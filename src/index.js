@@ -20,17 +20,17 @@ if (fs.existsSync(dataFilePath)) {
 }
 
 
-app.get('/users/', (req, res) => {
-    res.json(users);z
+app.get('/users', (req, res) => {
+    res.json(users);
 });
 
-app.get('/users/:id', (req, res) => {
+app.get('/user/:id', (req, res) => {
   try{
     const userId = parseInt(req.params.id, 10);
     if(isNaN(userId)){
       return res.status(400).json({error: 'Invalid user ID'});
     }
-    user = users.find(u => u.id == userId);
+    let user = users.find(u => u.id == userId);
     if(user){
       res.json(user);
     }
@@ -42,7 +42,7 @@ app.get('/users/:id', (req, res) => {
   }
 })
 
-app.post('/add', (req, res) => {
+app.post('/user', (req, res) => {
     try {
         const userInfor = req.body;
         if (!userInfor.name || !userInfor.age) {
@@ -63,7 +63,7 @@ app.post('/add', (req, res) => {
     }
 });
 
-app.delete('/delete/:id', (req, res) => {
+app.delete('/user/:id', (req, res) => {
     try {
         const userId = parseInt(req.params.id, 10);
         if (isNaN(userId)) {
@@ -84,7 +84,7 @@ app.delete('/delete/:id', (req, res) => {
     }
 });
 
-app.put('/update/:id', (req, res) => {
+app.put('/user/:id', (req, res) => {
     try {
         const userId = parseInt(req.params.id, 10);
         if (isNaN(userId)) {
