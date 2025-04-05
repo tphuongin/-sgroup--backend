@@ -1,1 +1,0 @@
-[{"id":1,"name":"Thu Phương","age":"19"},{"id":2,"name":"Nhi Nhi","age":15}]
