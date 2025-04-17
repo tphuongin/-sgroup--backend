@@ -1,21 +1,19 @@
 import * as userService from '../service/user.service.js'
+import { ObjectId } from 'mongodb';
 
-export function getAllUsers(req, res) {
+export async function getAllUsers(req, res) {
     try {
-        const users = userService.getAllUsers();
+        const users = await userService.getAllUsers();
         res.json(users);
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
 
-export function getUserById(req, res) {
+export async function getUserById(req, res) {
     try {
-        const userId = parseInt(req.params.id, 10);
-        if (isNaN(userId)) {
-            return res.status(400).json({ error: 'Invalid user ID' });
-        }
-        const user = userService.getUserById(userId);
+        const userId = new ObjectId(req.params.id);
+        const user = await userService.getUserById(userId); 
         if (user) {
             res.json(user);
         } else {
@@ -26,28 +24,21 @@ export function getUserById(req, res) {
     }
 }
 
-export function addUser(req, res) {
+export async function createUser(req, res) {
     try {
         const userInfor = req.body;
-        if (!userInfor.name || !userInfor.age) {
-            return res.status(400).json({ error: 'Name and age are required' });
-        }
-        const newUser = userService.addUser(userInfor);
-        res.status(201).json(newUser);
+        const newUser = await userService.createUser(userInfor.name, userInfor.age);
+        res.status(201).json({ id: newUser }); 
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
 
-export function updateUser(req, res) {
+export async function updateUser(req, res) {
     try {
-        const userId = parseInt(req.params.id, 10);
-        if (isNaN(userId)) {
-            return res.status(400).json({ error: 'Invalid user ID' });
-        }
+        const userId = new ObjectId(req.params.id);
         const updateData = req.body;
-        const updatedUser = userService.updateUser(userId, updateData);
-
+        const updatedUser = await userService.updateUser(userId, updateData); 
         if (updatedUser) {
             res.json(updatedUser);
         } else {
@@ -58,19 +49,23 @@ export function updateUser(req, res) {
     }
 }
 
-export function deleteUser(req, res) {
+export async function deleteUser(req, res) {
     try {
-        const userId = parseInt(req.params.id, 10);
-        if (isNaN(userId)) {
-            return res.status(400).json({ error: 'Invalid user ID' });
-        }
-        const success = userService.deleteUser(userId);
-        if (success) {
-            res.status(204).send();
+        const userId = new ObjectId(req.params.id);
+        const result = await userService.deleteUser(userId); 
+        if (result.deletedCount > 0) {
+            res.status(204).send(); 
         } else {
             res.status(404).json({ error: 'User not found' });
         }
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
     }
+}
+
+export function hello(req, res){
+    res.render('index.ejs', {
+        name: 'tp',
+        age: 19,
+    });
 }

@@ -1,49 +1,30 @@
-import { readDataFile, writeDataFile } from '../database/mockDatabase.js'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { getDB } from '../config/db.config.js';
 
-const fileName = fileURLToPath(import.meta.url)
-const dirName = path.dirname(fileName)
-const dataFile = path.resolve(dirName, '../database/data.json')
-
-export function addUser(userInfor) {
-    const users = readDataFile(dataFile);
-    let newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
-    const newUser = { id: newId, ...userInfor };
-    users.push(newUser);
-    writeDataFile(dataFile,users);
-    return newUser;
+export async function createUser(name, age) {
+    const result = await getDB().collection('users').insertOne({ name, age });
+    return result.insertedId;
 }
 
-export function updateUser(userId, updateData) {
-    const users = readDataFile(dataFile);
-    const index = users.findIndex(u => u.id === userId);
-
-    if (index !== -1) {
-        users[index] = { ...users[index], ...updateData };
-        writeDataFile(dataFile,users);
-        return users[index];
-    }
-    return null;
+export async function updateUser(userId, updateData) {
+    const result = await getDB().collection('users').findOneAndUpdate(
+        { _id: userId },
+        { $set: updateData },
+        { returnDocument: 'after' } 
+    );
+    return result; 
 }
 
-export function deleteUser(userId) {
-    const users = readDataFile(dataFile);
-    const index = users.findIndex(u => u.id === userId);
-
-    if (index !== -1) {
-        users.splice(index, 1);
-        writeDataFile(dataFile,users);
-        return true;
-    }
-    return false;
+export async function deleteUser(userId) {
+    const result = await getDB().collection('users').deleteOne({ _id: userId });
+    return result; 
 }
 
-export function getUserById(userId) {
-    const users = readDataFile(dataFile);
-    return users.find(u => u.id === userId);
+export async function getUserById(userId) {
+    const user = await getDB().collection('users').findOne({ _id: userId });
+    return user; 
 }
 
-export function getAllUsers() {
-    return readDataFile(dataFile);
+export async function getAllUsers() {
+    const users = await getDB().collection('users').find().toArray();
+    return users;
 }
