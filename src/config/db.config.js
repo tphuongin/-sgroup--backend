@@ -4,7 +4,7 @@ import 'dotenv/config';
 let dbInstance = null;
 const client = new MongoClient(process.env.MONGODB_URI);
 
-const connectDB = async () =>{
+const ConnectDB = async () =>{
     await client.connect();
     dbInstance = client.db(process.env.MONGODB_NAME);
 }
@@ -16,6 +16,6 @@ const getDB = () => {
 }
 
 export {
-    connectDB,
+    ConnectDB,
     getDB
 };

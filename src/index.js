@@ -1,35 +1,42 @@
 import express from 'express';
-import router from './routes/app.js'
-import templateEngineerConfig from './config/templateEngineer.config.js';
 import path from 'path';
-import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import {connectDB} from './config/db.config.js'
+import { ConnectDB } from './config/db.config.js';
+import authRoutes from './apis/auth/auth.router.js'; 
+import userRoutes from './apis/users/user.router.js';
+
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
-const startApp = async () =>{
-    const app = express();
-    const port = 3000;
+const app = express();
+const port = 3000;
 
-    app.use(express.json());
-    app.use('/',router)
-    templateEngineerConfig(app)
-    app.use(express.static(path.join(__dirname, 'public')))
+// Middleware to parse JSON
+app.use(express.json());
 
-    app.listen(port, () => {
-        console.log(`Example app listening on port ${port}`);
-    });
-}
-(
-    async () => {
-      try {
-        await connectDB();
-        console.log("Connect DB success");
-        await startApp();
-      } catch (err) {
-        console.error("Error connect:", err); 
+// API routes
+app.use('/auth', authRoutes); 
+app.use('/users', userRoutes); 
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Default route
+app.get('/', (req, res) => {
+    res.send('Welcome to the API');
+});
+
+
+// Start the server
+(async () => {
+    try {
+        await ConnectDB();
+        console.log('Database connected successfully');
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error('Database connection error:', err);
         process.exit(1);
-      }
     }
-)();
+})();
