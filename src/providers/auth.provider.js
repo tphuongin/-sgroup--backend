@@ -20,6 +20,12 @@ class AuthProvider {
     async decodeToken(token){
         return jwt.verify(token, SECRET_KEY)
     }
+    async verifyResetToken(token, resetPassToken, tokenExpiration){ 
+        if (Date.now() < tokenExpiration && token === resetPassToken) {
+            return true;
+        }
+        return false;
+    }
 }
 
 export default new AuthProvider();

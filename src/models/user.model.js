@@ -2,12 +2,11 @@ import { ObjectId } from "mongodb";
 import { getDB } from "../config/db.config.js"
 
 class UserModel{
-    async createUser(email, password, name, token){
+    async createUser(email, password, name){
         const user = await getDB().collection("users").insertOne({
             email,
             password,
             name,
-            token
         });
         return user;
     }
@@ -23,6 +22,20 @@ class UserModel{
     }
     async getUserByEmail(email){
         const user = await getDB().collection("users").findOne({email: email});
+        return user;
+    }
+    async updateUser(id, data){
+        const user = await getDB().collection("users").updateOne(
+            {_id: new ObjectId(String(id))},
+            {$set: data}
+        );
+        return user;
+    }
+    async saveResetPassToken(email, resetPassToken, tokenExpiration){
+        const user = await getDB().collection("users").updateOne(
+            {email: email},
+            {$set: {resetPassToken, tokenExpiration}}
+        );
         return user;
     }
 }
